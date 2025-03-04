@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #Run as root
-
-wget https://raw.githubusercontent.com/Muppetpants/cleanWireguard/master/cleanWireguard-Install.sh -O /root/cleanWireguard-Install.sh
+sleep 60
+wget https://raw.githubusercontent.com/angristan/wireguard-install/refs/heads/master/wireguard-install.sh -O /root/wireguard-install.sh
 
 
 apt install docker.io docker-compose -y
@@ -29,16 +29,22 @@ services:
 
 EOF
 
-tee -a /root/README.txt << EOF
-Now, install the wireguard server and create/download necessary client .confs:
+tee -a /root/READMEFIRST.txt << EOF
+INSTALL INSTRUCTIONS
+1. Install the wireguard server and create/download necessary client .confs:
 
-bash /root/cleanWireguard-Install.sh
+sudo bash /root/wireguard-install.sh
 
-Then, run bash /root/final.sh to stand up the chat client.
+Install the Matrix Server:
 
-Finally, run docker ps -a to confirm container is running. After running, connect client device to wireguard and, and configure element to use the server http://10.66.66.1:8008, or update hosts file to connect to http://matrix.chat.local:8008.
+sudo bash /root/final.sh 
 
+Finally, run docker ps -a to confirm container is running.
 
+ELEMENT USAGE INSTRUCTIONS
+To access the Element GUI, connect a client device to wireguard. Download and install the Element chat client.
+Then, configure element to use an custom server at http://10.66.66.1:8008. Anyone with a wireguard client certificate
+can register their own user name, create rooms, and chat with others on the VPN.
 EOF
 
 tee -a /root/final.sh << EOF
@@ -46,7 +52,7 @@ tee -a /root/final.sh << EOF
 cd /root/Docker/Matrix_Synapse 
 
 docker run -it --rm -v /root/Docker/Matrix_Synapse/data:/data -e SYNAPSE_SERVER_NAME=matrix.chat.local -e SYNAPSE_REPORT_STATS=yes matrixdotorg/synapse:latest generate
-sleep 4
+sleep 10
 echo "#" >> /root/Docker/Matrix_Synapse/data/homeserver.yaml
 
 echo "enable_registration: true" >> /root/Docker/Matrix_Synapse/data/homeserver.yaml
